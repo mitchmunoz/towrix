@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Internet solo para cargar la tipografía Bungee (Google Fonts).
-         Sin conexión el juego funciona igual, con una tipografía de respaldo. -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Sin permisos: el juego (y su tipografía Bungee) va completo dentro de la app y funciona sin internet. -->
 
     <application
         android:allowBackup="true"
