@@ -11,8 +11,9 @@ Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a 
 
 | Ruta | Qué es |
 |---|---|
-| `app/src/main/assets/index.html` | El juego completo (HTML5 canvas, un solo archivo) |
-| `app/src/main/java/com/newplayerone/towrix/MainActivity.java` | Contenedor WebView de Android: pantalla completa, guardado local, botón atrás, pausa al salir y notch |
+| `app/src/main/assets/index.html` | El juego completo (HTML5 canvas, un solo archivo, con la tipografía incluida) |
+| `app/src/main/assets/licenses/` | Licencia de la tipografía Bungee (SIL OFL 1.1), va dentro de la app |
+| `app/src/main/java/com/newplayerone/towrix/MainActivity.java` | Contenedor WebView de Android: pantalla completa, guardado local, botón atrás, pausa al salir, notch y selector de imagen para la bandera |
 | `app/src/main/res/mipmap-*/` | Ícono de la app (adaptable, redondo y clásico) |
 | `app/build.gradle` | Paquete, versión y SDK (minSdk 24, targetSdk 36) |
 
@@ -35,7 +36,9 @@ La llave de firma (`.jks`) **nunca** se sube a este repositorio (está en `.giti
 
 - **Nombre de paquete:** `com.newplayerone.towrix` se puede cambiar en `app/build.gradle` mientras la app no esté subida a Google Play. Después de subirla queda fijo para siempre.
 - **Orientación:** el juego se puede usar en vertical y en horizontal. La batalla se ve más grande en horizontal.
-- **Tipografía:** el logo y los menús usan Bungee desde Google Fonts (por eso la app pide permiso de internet). Sin conexión usa una tipografía de respaldo. Pendiente: incluir Bungee dentro del paquete.
+- **Tipografía:** Bungee va incrustada en `index.html` (subconjunto latino, 14 KB). La app no pide ningún permiso y funciona completa sin internet.
+- **Depurar en un celular:** en builds de prueba (debug) el WebView se puede inspeccionar desde `chrome://inspect` en Chrome de escritorio. En la versión publicada está desactivado.
+- **Actualizar el juego desde el prototipo:** si copias el HTML desde el artifact de Claude, revisa que el archivo empiece con `<!DOCTYPE html>`; el visor puede agregar un envoltorio `<html><head>…<body>` que hay que quitar.
 - **Botón atrás de Android:** en partida pausa, con una ventana abierta la cierra, en el menú vuelve a la portada y en la portada cierra la app.
 
 © New Player One
