@@ -1,0 +1,12 @@
+TOWRIX — Proyecto Android (New Player One)
+
+1) Esta carpeta se abre completa en Android Studio (File → Open → Towrix).
+2) El juego está en: app/src/main/assets/index.html
+3) Para actualizar el juego, reemplaza ese archivo por la versión nueva del prototipo.
+
+Datos de la app:
+- Nombre: TOWRIX
+- ID de la app (applicationId): com.newplayerone.towrix  (provisorio; no se puede cambiar después de publicar)
+- Versión: 0.6 (versionCode 1)
+- Android mínimo: 7.0 (API 24) · Apunta a Android 16 (API 36)
+- Sin anuncios. Usa internet solo para cargar la tipografía del logo y los menús (opcional).

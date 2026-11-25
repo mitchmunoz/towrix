@@ -1,0 +1,37 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.newplayerone.towrix'
+    compileSdk 36
+
+    defaultConfig {
+        // ⚠️ El applicationId es el "nombre interno" de la app en Google Play.
+        // Una vez que subas la app, NO se puede cambiar nunca.
+        // Si al crear la app en Play Console te pide otro nombre de paquete, cámbialo AQUÍ antes de subirla.
+        applicationId "com.newplayerone.towrix"
+        minSdk 24
+        targetSdk 36
+        // Cada vez que subas una actualización: suma 1 a versionCode (2, 3, 4...)
+        // y cambia versionName ("0.7", "1.0"...).
+        versionCode 1
+        versionName "0.6"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // Sin dependencias: el juego es un solo archivo HTML dentro de assets/.
+}

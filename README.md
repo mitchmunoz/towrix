@@ -1,0 +1,41 @@
+# TOWRIX
+
+Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a la cima y, cuando se apagan las luces de largada, derribas la bandera rival en una batalla en tiempo real.
+
+- **Versión actual:** 0.6 (prototipo) · versionCode 1
+- **Paquete:** `com.newplayerone.towrix` (provisorio, ver nota abajo)
+- **Plataformas:** Android (contenedor WebView nativo, sin Capacitor ni npm). iOS más adelante.
+- **Prototipo jugable (privado):** https://claude.ai/artifact/9ev1p5yQgcGAR4uSbiEHZM
+
+## Estructura
+
+| Ruta | Qué es |
+|---|---|
+| `app/src/main/assets/index.html` | El juego completo (HTML5 canvas, un solo archivo) |
+| `app/src/main/java/com/newplayerone/towrix/MainActivity.java` | Contenedor WebView de Android: pantalla completa, guardado local, botón atrás, pausa al salir y notch |
+| `app/src/main/res/mipmap-*/` | Ícono de la app (adaptable, redondo y clásico) |
+| `app/build.gradle` | Paquete, versión y SDK (minSdk 24, targetSdk 36) |
+
+## Qué incluye el juego (v0.6)
+
+- **Modo historia:** 5 mundos (Obra Central, Bosque Leñador, Glaciar Eterno, Volcán Furioso, Ciudad Neón), un jefe final cada 10 etapas y hasta 3 estrellas por etapa.
+- **Habilidades especiales** que se ganan venciendo jefes: Tiro triple, Reparar, Terremoto, Meteoro e Imán.
+- **Partida rápida** con 4 dificultades.
+- **Taller:** 17 tipos de personaje, ropa, sombreros, lentes, capas, herramientas con poder, mascotas con poder, banderas y celebraciones.
+- **Clima de la arena** que cambia durante la batalla y potencia o debilita los poderes.
+- **Calidad gráfica** automática, alta o ahorro.
+
+## Compilar
+
+Abrir la carpeta en Android Studio → *Sync Now* → **Build › Generate Signed App Bundle**.
+
+La llave de firma (`.jks`) **nunca** se sube a este repositorio (está en `.gitignore`).
+
+## Notas
+
+- **Nombre de paquete:** `com.newplayerone.towrix` se puede cambiar en `app/build.gradle` mientras la app no esté subida a Google Play. Después de subirla queda fijo para siempre.
+- **Orientación:** el juego se puede usar en vertical y en horizontal. La batalla se ve más grande en horizontal.
+- **Tipografía:** el logo y los menús usan Bungee desde Google Fonts (por eso la app pide permiso de internet). Sin conexión usa una tipografía de respaldo. Pendiente: incluir Bungee dentro del paquete.
+- **Botón atrás de Android:** en partida pausa, con una ventana abierta la cierra, en el menú vuelve a la portada y en la portada cierra la app.
+
+© New Player One
