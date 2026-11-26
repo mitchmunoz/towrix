@@ -2,7 +2,7 @@
 
 Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a la cima y, cuando se apagan las luces de largada, derribas la bandera rival en una batalla en tiempo real.
 
-- **Versión actual:** 0.6 (prototipo) · versionCode 1
+- **Versión actual:** 1.0 · versionCode 1 (primera versión para Google Play)
 - **Paquete:** `com.newplayerone.towrix` (provisorio, ver nota abajo)
 - **Plataformas:** Android (contenedor WebView nativo, sin Capacitor ni npm). iOS más adelante.
 - **Prototipo jugable (privado):** https://claude.ai/artifact/9ev1p5yQgcGAR4uSbiEHZM
@@ -17,7 +17,7 @@ Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a 
 | `app/src/main/res/mipmap-*/` | Ícono de la app (adaptable, redondo y clásico) |
 | `app/build.gradle` | Paquete, versión y SDK (minSdk 24, targetSdk 36) |
 
-## Qué incluye el juego (v0.6)
+## Qué incluye el juego (v1.0)
 
 - **Modo historia:** 5 mundos (Obra Central, Bosque Leñador, Glaciar Eterno, Volcán Furioso, Ciudad Neón), un jefe final cada 10 etapas y hasta 3 estrellas por etapa.
 - **Habilidades especiales** que se ganan venciendo jefes: Tiro triple, Reparar, Terremoto, Meteoro e Imán.

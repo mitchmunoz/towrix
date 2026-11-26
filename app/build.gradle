@@ -16,7 +16,7 @@ android {
         // Cada vez que subas una actualización: suma 1 a versionCode (2, 3, 4...)
         // y cambia versionName ("0.7", "1.0"...).
         versionCode 1
-        versionName "0.6"
+        versionName "1.0"
     }
 
     buildTypes {

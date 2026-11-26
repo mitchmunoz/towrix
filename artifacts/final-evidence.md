@@ -60,4 +60,4 @@ Vertical 412×915 y horizontal 915×412, DPR 2. Resultado idéntico en ambas:
 
 - R8/`shrinkResources`: la app casi no tiene código Java, así que la ganancia sería mínima y no se pudo compilar para verificarlo.
 - Íconos PNG: `aapt2` ya los comprime al generar el release.
-- `versionCode` 1 / `versionName` 0.6: hay que subirlos antes de publicar una actualización en Play.
+- Versión publicada como 1.0 (`versionCode` 1). Cada actualización en Play debe subir `versionCode`.
