@@ -1449,6 +1449,16 @@ function useSkill(T,k,ang,pow){
   updateHud();return true;
 }
 /* ---- cámara y dibujo ---- */
+/* ajusta t a maxW: si no cabe lo parte en 2 líneas por el corte más equilibrado (' · ' > ': ' > ' ') y achica la letra si aún no cabe.
+   font(px) devuelve la fuente; deja g.font listo y devuelve {l:líneas,s:tamaño} */
+const FITC=new Map();
+function fitText(g,t,maxW,font,size,minS){
+  const key=t+'|'+Math.round(maxW)+'|'+font(size);let r=FITC.get(key);
+  if(!r){g.font=font(size);const mw=x=>g.measureText(x).width;let l=[t],w=mw(t);
+    if(w>maxW){let best=null;for(const [sp,pen] of [[' · ',0],[': ',6],[' ',14]]){let k=t.indexOf(sp);while(k>0){const a=t.slice(0,k)+(sp===': '?':':''),b=t.slice(k+sp.length),m=Math.max(mw(a),mw(b))+pen;if(!best||m<best.m)best={m,l:[a,b]};k=t.indexOf(sp,k+1);}}
+      if(best){l=best.l;w=Math.max(...l.map(mw));}}
+    r={l,s:w>maxW?Math.max(minS||9,size*maxW/w):size};if(FITC.size>200)FITC.clear();FITC.set(key,r);}
+  g.font=font(r.s);return r;}
 let cam={sc:1,ox:0,gy:0};
 const SX=x=>cam.ox+x*cam.sc,SY=y=>cam.gy-y*cam.sc;
 function render(dt){
@@ -1456,9 +1466,9 @@ function render(dt){
   if(G.phase==='ready'||G.phase==='build')renderBuild(g);else renderBattle(g,dt);
   // banner
   if(G.banner){const b=G.banner,k=b.t/b.dur,a=k<.15?k/.15:k>.8?(1-k)/.2:1;const z=1+(1-clamp(k/.15,0,1))*.6;g.save();g.globalAlpha=clamp(a,0,1);g.translate(W/2,H*.4);g.rotate(-.05);g.scale(z,z);
-    g.font=`900 italic ${Math.min(60,W*.11)}px Impact,system-ui`;g.textAlign='center';g.textBaseline='middle';g.lineWidth=8;g.strokeStyle='#000';g.strokeText(b.txt,0,0);
+    {const fs=Math.min(60,W*.11);g.font=`900 italic ${fs}px Impact,system-ui`;const tw=g.measureText(b.txt).width;if(tw>W-24)g.font=`900 italic ${(fs*(W-24)/tw).toFixed(1)}px Impact,system-ui`;}g.textAlign='center';g.textBaseline='middle';g.lineWidth=8;g.strokeStyle='#000';g.strokeText(b.txt,0,0);
     const tg=g.createLinearGradient(0,-30,0,30);tg.addColorStop(0,'#f4ff81');tg.addColorStop(.5,'#c6ff00');tg.addColorStop(1,'#ff2d95');g.fillStyle=tg;g.fillText(b.txt,0,0);
-    if(b.sub){g.font='800 15px system-ui';g.fillStyle='#fff';g.lineWidth=4;g.strokeText(b.sub,0,Math.min(46,W*.08));g.fillText(b.sub,0,Math.min(46,W*.08));}g.restore();}
+    if(b.sub){const F_=fitText(g,b.sub,W-24,px=>`800 ${px}px system-ui`,15,10),y0=Math.min(46,W*.08);g.fillStyle='#fff';g.lineWidth=4;F_.l.forEach((ln,i)=>{const yy=y0+i*F_.s*1.25;g.strokeText(ln,0,yy);g.fillText(ln,0,yy);});}g.restore();}
   if(G.flash>0){g.fillStyle=`rgba(255,255,255,${G.flash*.7})`;g.fillRect(0,0,W,H);}
 }
 const BPC={};
@@ -1712,7 +1722,8 @@ function renderBattle(g,dt){
     if(!L.fired){g.strokeStyle=`rgba(255,45,149,${.35+.35*Math.sin(G.t*30)})`;g.lineWidth=1.5;g.beginPath();g.moveTo(x0,y);g.lineTo(x1,y);g.stroke();}
     else{const a=clamp(L.t/.45,0,1);g.save();g.globalCompositeOperation='lighter';g.strokeStyle=`rgba(255,45,149,${.6*a})`;g.lineWidth=14*cam.sc;g.beginPath();g.moveTo(x0,y);g.lineTo(x1,y);g.stroke();g.strokeStyle=`rgba(255,255,255,${a})`;g.lineWidth=Math.max(2,3*cam.sc);g.stroke();g.restore();}}
   for(const p of G.parts){g.globalAlpha=clamp(p.life/p.max,0,1);if(p.emoji){g.font=`${p.sz*cam.sc*1.4}px system-ui`;g.textAlign='center';g.fillStyle='#fff';g.fillText(p.emoji,SX(p.x),SY(p.y));}else{const a=clamp(p.life/p.max,0,1),r=p.sz*.55*(.6+.4*a)*Math.max(1,cam.sc*.8);g.globalCompositeOperation=p.glow?'lighter':'source-over';g.fillStyle=p.col;g.beginPath();g.arc(SX(p.x),SY(p.y),r,0,7);g.fill();if(p.glow&&QUAL.lv>0){g.globalAlpha=a*.25;g.beginPath();g.arc(SX(p.x),SY(p.y),r*2.6,0,7);g.fill();}}}g.globalAlpha=1;g.globalCompositeOperation='source-over';
-  for(const p of G.pops){g.globalAlpha=clamp(p.life,0,1);g.font=`900 italic ${Math.max(13,18*cam.sc)}px system-ui`;g.textAlign='center';g.lineWidth=4;g.strokeStyle='#000';g.strokeText(p.txt,SX(p.x),SY(p.y));g.fillStyle=p.col;g.fillText(p.txt,SX(p.x),SY(p.y));}g.globalAlpha=1;
+  for(const p of G.pops){g.globalAlpha=clamp(p.life,0,1);const F_=fitText(g,p.txt,Math.min(W-16,Math.max(160,W*.5-8)),px=>`900 italic ${px}px system-ui`,Math.max(13,18*cam.sc),10),lh=F_.s*1.15;g.textAlign='center';g.lineWidth=4;g.strokeStyle='#000';g.fillStyle=p.col;
+    const tw=Math.max(...F_.l.map(x=>g.measureText(x).width)),px=clamp(SX(p.x),tw/2+8,W-tw/2-8),py=SY(p.y)-(F_.l.length-1)*lh;F_.l.forEach((ln,i)=>{g.strokeText(ln,px,py+i*lh);g.fillText(ln,px,py+i*lh);});}g.globalAlpha=1;
   g.restore();
   drawWeatherFront(g);
   drawBossBar(g);
