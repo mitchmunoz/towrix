@@ -16,6 +16,8 @@ Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a 
 | `app/src/main/java/com/newplayerone/towrix/Ads.java` | Videos con recompensa (AdMob) y consentimiento (UMP), expuestos al juego como `AndroidAds` |
 | `app/src/main/java/com/newplayerone/towrix/MainActivity.java` | Contenedor WebView de Android: pantalla completa, guardado local, botón atrás, pausa al salir, notch y selector de imagen para la bandera |
 | `app/src/main/res/mipmap-*/` | Ícono de la app (adaptable, redondo y clásico) |
+| `store/` | Ficha de Google Play: ícono 512, gráfico de funciones, 6 capturas del juego real y textos (`ficha-play-store.md`) |
+| `docs/` | Página web (GitHub Pages): política de privacidad en `docs/privacidad.html` |
 | `app/build.gradle` | Paquete, versión y SDK (minSdk 24, targetSdk 36) |
 
 ## Qué incluye el juego (v1.0)
