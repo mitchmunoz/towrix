@@ -13,6 +13,7 @@ Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a 
 |---|---|
 | `app/src/main/assets/index.html` | El juego completo (HTML5 canvas, un solo archivo, con la tipografía incluida) |
 | `app/src/main/assets/licenses/` | Licencia de la tipografía Bungee (SIL OFL 1.1), va dentro de la app |
+| `app/src/main/java/com/newplayerone/towrix/Ads.java` | Videos con recompensa (AdMob) y consentimiento (UMP), expuestos al juego como `AndroidAds` |
 | `app/src/main/java/com/newplayerone/towrix/MainActivity.java` | Contenedor WebView de Android: pantalla completa, guardado local, botón atrás, pausa al salir, notch y selector de imagen para la bandera |
 | `app/src/main/res/mipmap-*/` | Ícono de la app (adaptable, redondo y clásico) |
 | `app/build.gradle` | Paquete, versión y SDK (minSdk 24, targetSdk 36) |
@@ -25,6 +26,19 @@ Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a 
 - **Taller:** 17 tipos de personaje, ropa, sombreros, lentes, capas, herramientas con poder, mascotas con poder, banderas y celebraciones.
 - **Clima de la arena** que cambia durante la batalla y potencia o debilita los poderes.
 - **Calidad gráfica** automática, alta o ahorro.
+
+## Anuncios (videos con recompensa)
+
+El juego no muestra anuncios por su cuenta: solo ofrece videos **opcionales** que dan premio.
+- **Resultado de una partida:** "📺 Duplicar monedas" (una vez por partida).
+- **Taller / Materiales:** cuando te faltan monedas para comprar, "📺 Video: +50 🪙" (máximo 5 al día).
+- **Menú → Privacidad:** aparece solo cuando la ley lo exige (Europa/Reino Unido) para cambiar el consentimiento.
+
+En el navegador (prototipo) no hay anuncios: los botones solo aparecen dentro de la app.
+
+**Antes de publicar** pon tus IDs reales en `gradle.properties` (`TOWRIX_ADMOB_APP_ID` y `TOWRIX_ADMOB_REWARDED_ID`).
+Hoy tienen los IDs de prueba de Google. Los builds *debug* usan siempre los de prueba, para que nunca toques tus anuncios reales.
+En AdMob crea también el mensaje de consentimiento (Privacidad y mensajes → GDPR) y publica `app-ads.txt` en el sitio web de desarrollador que declares en Play.
 
 ## Compilar
 

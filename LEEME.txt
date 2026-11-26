@@ -10,4 +10,5 @@ Datos de la app:
 - ID de la app (applicationId): com.newplayerone.towrix  (provisorio; no se puede cambiar después de publicar)
 - Versión: 1.0 (versionCode 1)
 - Android mínimo: 7.0 (API 24) · Apunta a Android 16 (API 36)
-- Sin anuncios y sin permisos: no usa internet (la tipografía va incluida en el juego).
+- Videos con recompensa opcionales (AdMob). Usa internet solo para esos videos; el juego se puede jugar sin conexión.
+- IDs de AdMob: en gradle.properties (hoy son los de prueba de Google; cámbialos antes de publicar).

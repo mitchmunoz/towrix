@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
 
     private static final int REQ_FILE = 42;
     private WebView web;
+    private Ads ads;
     /** Respuesta pendiente del selector de imágenes (bandera "Tu imagen"). */
     private ValueCallback<Uri[]> fileCallback;
 
@@ -79,6 +80,8 @@ public class MainActivity extends Activity {
             }
         });
         web.addJavascriptInterface(new Bridge(), "AndroidApp");
+        ads = new Ads(this, web);
+        web.addJavascriptInterface(ads, "AndroidAds");   // videos con recompensa (AdMob)
 
         root.addView(web, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -104,6 +107,9 @@ public class MainActivity extends Activity {
         }
 
         web.loadUrl("file:///android_asset/index.html");
+
+        // Consentimiento (UMP) y anuncios: se piden en cada inicio, como exige Google
+        ads.start();
     }
 
     /** Botón "atrás": el juego decide (pausa, volver al menú...). Si no lo usa, se cierra la app. */
