@@ -170,6 +170,10 @@
   .buybar button{font:inherit;font-weight:900;border:0;border-radius:10px;padding:8px 14px;cursor:pointer}
   .buybar .ok{background:#c6ff00;color:#1a1026}.buybar .no{background:rgba(255,255,255,.15);color:#fff}
   .buybar .ok[disabled]{background:#555;color:#bbb}
+  .buybar .ad,button.b.ad{background:linear-gradient(180deg,#ffe14d,#ffb300);color:#1a1026}
+  button.b.ad{box-shadow:0 4px 0 #8a4b00;font-size:15px}
+  .buybar .ad small{font-weight:700;opacity:.75}
+  [data-adslot]:empty{display:none}
   .tile.try{border-color:#ffd400;border-style:dashed;background:rgba(255,212,0,.12)}
 </style>
 </head>
@@ -2032,10 +2036,11 @@ function menuItems(){const n=SV.stage,wi=worldIdx(n);return[
   {k:'scores',t:'RÉCORDS',ic:'🏆'},{k:'help',t:'CÓMO JUGAR',ic:'📐'},
   {k:'sound',t:'SONIDO',sw:SV.sound},{k:'music',t:'MÚSICA',sw:SV.music},
   {k:'quality',t:'CALIDAD GRÁFICA',qv:{auto:'AUTO',alta:'ALTA',baja:'AHORRO'}[SV.quality||'auto']},
+  ...(ADS.privacy()?[{k:'privacy',t:'PRIVACIDAD',cls:'small'}]:[]),
   {k:'credits',t:'CRÉDITOS',cls:'small'}];}
 const TOGGLES=['sound','music','quality'];
 function renderMenu(){
-  const RT=[-1,1.2,-1.1,.9,-1.3,1,-.8,0,0,0,.6];
+  const RT=[-1,1.2,-1.1,.9,-1.3,1,-.8,0,0,0,.6,-.6];
   $('arcList').innerHTML=menuItems().map((m,i)=>{const sel=i===mSel?' sel':'';
     if(m.qv!=null)return `<div class="brk wide${sel}" data-i="${i}"><span>${m.t}</span><span class="qv">◀ ${m.qv} ▶</span></div>`;
     if(m.sw!=null)return `<div class="brk${m.sw?' on':''}${sel}" data-i="${i}"><span>${m.t}</span><span class="lv"></span></div>`;
@@ -2058,10 +2063,28 @@ function menuAct(k){
   if(k==='quality'){const o=['auto','alta','baja'];SV.quality=o[(o.indexOf(SV.quality||'auto')+1)%3];setQuality();save();sfx('ok');renderMenu();
     toast({auto:'Calidad automática: baja sola si el celular va lento',alta:'Calidad alta: todos los efectos',baja:'Modo ahorro: menos efectos y más batería'}[SV.quality]);return;}
   sfx('ok');TRY=null;TRYMAT=null;
-  ({camp:showCamp,quick:showPlay,taller:showTaller,mats:showMats,skills:showSkills,scores:showScores,help:showHelp,credits:showCredits})[k]();
+  ({camp:showCamp,quick:showPlay,taller:showTaller,mats:showMats,skills:showSkills,scores:showScores,help:showHelp,credits:showCredits,privacy:()=>{try{AndroidAds.showPrivacyOptions();}catch(e){}}})[k]();
 }
+/* ================= VIDEOS CON RECOMPENSA (solo en la app Android: puente AndroidAds) ================= */
+const AD_FREE=50,AD_FREE_DAY=5;
+const ADS={cb:null,place:null,
+  on(){return !!window.AndroidAds;},
+  ready(){try{return !!(window.AndroidAds&&AndroidAds.isRewardedReady());}catch(e){return false;}},
+  privacy(){try{return !!(window.AndroidAds&&AndroidAds.privacyOptionsRequired());}catch(e){return false;}},
+  show(place,cb){if(!ADS.ready()){toast('El video no está listo, prueba en un rato');sfx('no');fillAdSlots();return;}
+    ADS.cb=cb;ADS.place=place;try{if(AC&&AC.state==='running')AC.suspend();}catch(e){}AndroidAds.showRewarded(place);},
+  today(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();},
+  freeLeft(){const a=SV.adFree;return a&&a.d===ADS.today()?Math.max(0,AD_FREE_DAY-a.n):AD_FREE_DAY;},
+  useFree(){const t=ADS.today();if(!SV.adFree||SV.adFree.d!==t)SV.adFree={d:t,n:0};SV.adFree.n++;}};
+window.onRewardedResult=function(place,earned){try{if(AC&&AC.state==='suspended')AC.resume();}catch(e){}
+  const cb=ADS.cb;ADS.cb=null;if(cb&&place===ADS.place)cb(!!earned);};
+window.onRewardedReady=function(){fillAdSlots();};
+function fillAdSlots(){if(!ADS.on())return;const rd=ADS.ready();document.querySelectorAll('#card [data-adslot]').forEach(el=>{let h='';
+  if(rd&&el.dataset.adslot==='double'){const r=G.result;if(r&&r.coins>0&&!r.doubled)h=`<button class="b ad" data-act="ad_double">📺 VER VIDEO · DUPLICAR +${r.coins} 🪙</button>`;}
+  if(rd&&el.dataset.adslot==='free'){const n=ADS.freeLeft();if(n>0)h=`<button class="ad" data-act="ad_free" data-from="${el.dataset.from||''}">📺 VIDEO: +${AD_FREE} 🪙 <small>(quedan ${n} hoy)</small></button>`;}
+  if(el.innerHTML!==h)el.innerHTML=h;});}
 let cardBack=null;
-function showCard(html,back){$('card').innerHTML=html;$('ov').classList.remove('hide');cardBack=back||null;$('card').scrollTop=0;}
+function showCard(html,back){$('card').innerHTML=html;$('ov').classList.remove('hide');cardBack=back||null;$('card').scrollTop=0;fillAdSlots();}
 function hideCard(){$('ov').classList.add('hide');cardBack=null;}
 function closeCardBack(){sfx('back');if(cardBack)cardBack();else hideCard();}
 function toast(t){const e=$('toast');e.textContent=t;e.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.opacity=0,1700);}
@@ -2102,6 +2125,13 @@ const ACT={
   taller_ok:()=>{keepName();TRY=null;save();sfx('ok');hideCard();renderMenu();},
   resume:()=>{G.paused=false;hideCard();sfx('ok');},
   retry:()=>{G.paused=false;sfx('ok');startMatch();},
+  ad_double:()=>ADS.show('double',ok=>{const r=G.result;
+    if(ok&&r&&!r.doubled){r.doubled=true;SV.coins+=r.coins;SV.earned+=r.coins;save();sfx('buy');toast(`¡+${r.coins} 🪙 extra!`);}
+    else if(!ok)toast('Mira el video completo para recibir el premio');showResult();}),
+  ad_free:d=>{const from=d.from;ADS.show('free',ok=>{
+    if(ok&&ADS.freeLeft()>0){ADS.useFree();SV.coins+=AD_FREE;SV.earned+=AD_FREE;save();sfx('buy');toast(`¡+${AD_FREE} 🪙!`);}
+    else if(!ok)toast('Mira el video completo para recibir el premio');
+    ({taller:showTaller,play:showPlay,camp:()=>showStage(G.selStage)}[from]||showMats)();});},
   start_cfg:()=>{sfx('ok');setMode('menu');renderMenu();if(G.lastMode==='camp')showStage(G.stageN);else showPlay();},
 };
 function keepName(){const el=$('nm');if(el){const v=(el.value||'').trim().toUpperCase().slice(0,12);if(v)SV.name=v;}}
@@ -2115,7 +2145,7 @@ function matRow(k,from){
   const M=MATS[k],own=!!SV.mats[k],sel=SV.mat===k;
   const tr=TRYMAT===k;
   let h=`<div class="mat${sel?' sel':''}${tr?' sel':''}" data-act="mat" data-v="${k}" data-from="${from}"><canvas data-mat="${k}" width="124" height="80"></canvas><div class="mi"><b>${M.n}</b><div>${M.d}</div></div><div class="pr">${own?(sel?'✓ EN USO':'TUYA'):tr?'👀 VIENDO':M.p+' 🪙'}</div></div>`;
-  if(tr){const can=SV.coins>=M.p;h+=`<div class="buybar"><canvas data-matbig="${k}" width="360" height="200" style="width:180px;height:100px"></canvas><div style="flex:1;min-width:140px">¿Comprar <b>${M.n}</b> por ${M.p} 🪙?<br><span style="font-weight:600;font-size:12px;opacity:.8">Tienes ${SV.coins} 🪙</span></div><button class="ok" data-act="mat_ok" data-v="${k}" data-from="${from}" ${can?'':'disabled'}>${can?'CONFIRMAR COMPRA':'TE FALTAN '+(M.p-SV.coins)}</button><button class="no" data-act="mat_no" data-from="${from}">CANCELAR</button></div>`;}
+  if(tr){const can=SV.coins>=M.p;h+=`<div class="buybar"><canvas data-matbig="${k}" width="360" height="200" style="width:180px;height:100px"></canvas><div style="flex:1;min-width:140px">¿Comprar <b>${M.n}</b> por ${M.p} 🪙?<br><span style="font-weight:600;font-size:12px;opacity:.8">Tienes ${SV.coins} 🪙</span></div><button class="ok" data-act="mat_ok" data-v="${k}" data-from="${from}" ${can?'':'disabled'}>${can?'CONFIRMAR COMPRA':'TE FALTAN '+(M.p-SV.coins)}</button>${can?'':`<span data-adslot="free" data-from="${from}"></span>`}<button class="no" data-act="mat_no" data-from="${from}">CANCELAR</button></div>`;}
   return h;
 }
 function paintMatBig(){document.querySelectorAll('canvas[data-matbig]').forEach(c=>{const g=c.getContext('2d'),m=c.dataset.matbig,a=SV.look.art;g.clearRect(0,0,360,200);
@@ -2151,7 +2181,7 @@ function showTaller(){
     const pw=tTab==='pet'&&PETPOW[it.id]?`<div class="ts">🐾 ${PETPOW[it.id].d}</div>`:tTab==='acc'&&ACCPOW[it.id]?`<div class="ts">🧰 ${ACCPOW[it.id].d}</div>`:it.lockW!=null?`<div class="ts">👑 Personaje de jefe</div>`:'';
     return `<div class="tile${sel?' sel':''}${own?'':' lock'}${tr?' try':''}" data-act="item" data-v="${it.id}">${vis}<div class="tn">${lab}</div>${pw}<div class="tp${own?' own':''}">${tr?'👀 PROBANDO':sel?'✓ PUESTO':own?'TUYO':it.lockW!=null?'🔒 JEFE MUNDO '+(it.lockW+1):it.p+' 🪙'}</div></div>`;}).join('');
   let bb='';
-  if(TRY){const it=CAT[TRY.cat].find(i=>i.id===TRY.id),can=SV.coins>=it.p;if(it.lockW!=null)bb=`<div class="buybar"><span>👀 Probando: <b>${it.n}</b></span><button class="ok" disabled>🔒 VENCE A ${WORLDS[it.lockW].boss.n}</button><button class="no" data-act="buy_no">CANCELAR</button></div>`;else bb=`<div class="buybar"><span>👀 Probando: <b>${it.n}</b> · ${it.p} 🪙</span><button class="ok" data-act="buy_ok" ${can?'':'disabled'}>${can?'CONFIRMAR COMPRA':'TE FALTAN '+(it.p-SV.coins)+' 🪙'}</button><button class="no" data-act="buy_no">CANCELAR</button></div>`;}
+  if(TRY){const it=CAT[TRY.cat].find(i=>i.id===TRY.id),can=SV.coins>=it.p;if(it.lockW!=null)bb=`<div class="buybar"><span>👀 Probando: <b>${it.n}</b></span><button class="ok" disabled>🔒 VENCE A ${WORLDS[it.lockW].boss.n}</button><button class="no" data-act="buy_no">CANCELAR</button></div>`;else bb=`<div class="buybar"><span>👀 Probando: <b>${it.n}</b> · ${it.p} 🪙</span><button class="ok" data-act="buy_ok" ${can?'':'disabled'}>${can?'CONFIRMAR COMPRA':'TE FALTAN '+(it.p-SV.coins)+' 🪙'}</button>${can?'':'<span data-adslot="free" data-from="taller"></span>'}<button class="no" data-act="buy_no">CANCELAR</button></div>`;}
   const note=!TRY&&tTab!=='flag'&&tTab!=='pet'&&tTab!=='celeb'&&tTab!=='art'?'<p style="font-size:13px">Toca un artículo para probártelo. Lo compras solo si confirmas.</p>':tTab==='art'?'<p style="font-size:13px">El estilo de arte también cambia cómo se ven tus materiales y tu torre.</p>':tTab==='celeb'?'<p style="font-size:13px">Tócala para ver la celebración arriba.</p>':tTab==='pet'?'<p style="font-size:13px">Cada mascota da un poder especial en la batalla. ¡Pruébalas antes de comprar!</p>':tTab==='flag'?'<p style="font-size:13px">Tu bandera va en la cima de la torre. ¡Si toca el suelo, pierdes!</p>':'';
   showCard(`<h2>TALLER DE PERSONAJE</h2><canvas id="pv" width="640" height="440"></canvas>${bb}
   <label class="fld">Nombre<input id="nm" maxlength="12" value="${SV.name}"></label>
@@ -2226,7 +2256,7 @@ function showHelp(){
   <div class="btns"><button class="b alt" data-act="close">VOLVER</button></div>`);
 }
 function showCredits(){
-  showCard(`<h2>CRÉDITOS</h2><p><b>TOWRIX</b><br>Un juego de New Player One</p><p>Diseño y producción: Mitchel Muñoz Zúñiga<br>Desarrollo: New Player One + Claude</p><p>Música de batalla original: "Obra en Obra" y "Derrumbe" (New Player One)<br>Menús (dominio público, interpretadas por el juego desde la partitura): Satie, <i>Gymnopédie n.º 1</i> · Beethoven, <i>Para Elisa</i> y <i>Oda a la alegría</i> · Pachelbel, <i>Canon en re</i> · Petzold, <i>Minueto en sol</i> · Brahms, <i>Canción de cuna</i></p><p style="font-size:13px;opacity:.8">Tipografía Bungee © The Bungee Project Authors, licencia SIL Open Font License 1.1</p><p style="opacity:.6;font-size:13px">Prototipo v0.6 · 2026</p><div class="btns"><button class="b alt" data-act="close">VOLVER</button></div>`);
+  showCard(`<h2>CRÉDITOS</h2><p><b>TOWRIX</b><br>Un juego de New Player One</p><p>Diseño y producción: Mitchel Muñoz Zúñiga<br>Desarrollo: New Player One + Claude</p><p>Música de batalla original: "Obra en Obra" y "Derrumbe" (New Player One)<br>Menús (dominio público, interpretadas por el juego desde la partitura): Satie, <i>Gymnopédie n.º 1</i> · Beethoven, <i>Para Elisa</i> y <i>Oda a la alegría</i> · Pachelbel, <i>Canon en re</i> · Petzold, <i>Minueto en sol</i> · Brahms, <i>Canción de cuna</i></p><p style="font-size:13px;opacity:.8">Tipografía Bungee © The Bungee Project Authors, licencia SIL Open Font License 1.1</p><p style="opacity:.6;font-size:13px">Versión 1.0 · 2026</p><div class="btns"><button class="b alt" data-act="close">VOLVER</button></div>`);
 }
 function pause(){G.paused=true;sfx('back');showCard(`<h2>PAUSA</h2><div class="btns"><button class="b lime" data-act="resume">CONTINUAR</button><button class="b alt" data-act="retry">REINICIAR</button><button class="b alt" data-act="menu">SALIR AL MENÚ</button></div>`,()=>ACT.resume());}
 function showResult(){
@@ -2240,7 +2270,7 @@ function showResult(){
     btns=(cp.win?`<button class="b lime" data-act="next">SIGUIENTE ETAPA ▶</button><button class="b alt" data-act="retry">REPETIR ETAPA</button>`:`<button class="b lime" data-act="retry">REINTENTAR</button>`)+`<button class="b alt" data-act="camp">VER MAPA</button><button class="b alt" data-act="menu">MENÚ</button>`;
   }else btns=`<button class="b lime" data-act="retry">REVANCHA</button><button class="b alt" data-act="start_cfg">CAMBIAR DIFICULTAD / MATERIAL</button><button class="b alt" data-act="menu">MENÚ</button>`;
   showCard(`<h1>${t}</h1><p>${s}</p>${extra}<div class="chips"><span class="chip">${D.n}</span><span class="chip">🧱 te quedaron ${r.remaining} piezas</span><span class="chip">💫 rival botado ×${G.C.char.kos}</span><span class="chip">${MATS[G.P.mat].n}</span></div>
-  <div class="coinwin">+${r.coins} 🪙</div><div class="btns">${btns}</div>`,()=>ACT.menu());
+  <div class="coinwin">+${r.doubled?r.coins*2:r.coins} 🪙${r.doubled?' <small style="font-size:14px">(×2 con video)</small>':''}</div><div class="btns"><div data-adslot="double" style="display:contents"></div>${btns}</div>`,()=>ACT.menu());
 }
 
 /* ================= PESTAÑA OCULTA ================= */

@@ -2,7 +2,7 @@
 
 Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a la cima y, cuando se apagan las luces de largada, derribas la bandera rival en una batalla en tiempo real.
 
-- **Versión actual:** 0.6 (prototipo) · versionCode 1
+- **Versión actual:** 1.0 · versionCode 1 (primera versión para Google Play)
 - **Paquete:** `com.newplayerone.towrix` (provisorio, ver nota abajo)
 - **Plataformas:** Android (contenedor WebView nativo, sin Capacitor ni npm). iOS más adelante.
 - **Prototipo jugable (privado):** https://claude.ai/artifact/9ev1p5yQgcGAR4uSbiEHZM
@@ -13,11 +13,14 @@ Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a 
 |---|---|
 | `app/src/main/assets/index.html` | El juego completo (HTML5 canvas, un solo archivo, con la tipografía incluida) |
 | `app/src/main/assets/licenses/` | Licencia de la tipografía Bungee (SIL OFL 1.1), va dentro de la app |
+| `app/src/main/java/com/newplayerone/towrix/Ads.java` | Videos con recompensa (AdMob) y consentimiento (UMP), expuestos al juego como `AndroidAds` |
 | `app/src/main/java/com/newplayerone/towrix/MainActivity.java` | Contenedor WebView de Android: pantalla completa, guardado local, botón atrás, pausa al salir, notch y selector de imagen para la bandera |
 | `app/src/main/res/mipmap-*/` | Ícono de la app (adaptable, redondo y clásico) |
+| `store/` | Ficha de Google Play: ícono 512, gráfico de funciones, 6 capturas del juego real y textos (`ficha-play-store.md`) |
+| `docs/` | Página web (GitHub Pages): política de privacidad en `docs/privacidad.html` |
 | `app/build.gradle` | Paquete, versión y SDK (minSdk 24, targetSdk 36) |
 
-## Qué incluye el juego (v0.6)
+## Qué incluye el juego (v1.0)
 
 - **Modo historia:** 5 mundos (Obra Central, Bosque Leñador, Glaciar Eterno, Volcán Furioso, Ciudad Neón), un jefe final cada 10 etapas y hasta 3 estrellas por etapa.
 - **Habilidades especiales** que se ganan venciendo jefes: Tiro triple, Reparar, Terremoto, Meteoro e Imán.
@@ -25,6 +28,19 @@ Juego de **New Player One**: construyes tu torre vista desde arriba, te subes a 
 - **Taller:** 17 tipos de personaje, ropa, sombreros, lentes, capas, herramientas con poder, mascotas con poder, banderas y celebraciones.
 - **Clima de la arena** que cambia durante la batalla y potencia o debilita los poderes.
 - **Calidad gráfica** automática, alta o ahorro.
+
+## Anuncios (videos con recompensa)
+
+El juego no muestra anuncios por su cuenta: solo ofrece videos **opcionales** que dan premio.
+- **Resultado de una partida:** "📺 Duplicar monedas" (una vez por partida).
+- **Taller / Materiales:** cuando te faltan monedas para comprar, "📺 Video: +50 🪙" (máximo 5 al día).
+- **Menú → Privacidad:** aparece solo cuando la ley lo exige (Europa/Reino Unido) para cambiar el consentimiento.
+
+En el navegador (prototipo) no hay anuncios: los botones solo aparecen dentro de la app.
+
+**Antes de publicar** pon tus IDs reales en `gradle.properties` (`TOWRIX_ADMOB_APP_ID` y `TOWRIX_ADMOB_REWARDED_ID`).
+Hoy tienen los IDs de prueba de Google. Los builds *debug* usan siempre los de prueba, para que nunca toques tus anuncios reales.
+En AdMob crea también el mensaje de consentimiento (Privacidad y mensajes → GDPR) y publica `app-ads.txt` en el sitio web de desarrollador que declares en Play.
 
 ## Compilar
 
